@@ -1,0 +1,1267 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProBilling ERP - Advanced GST Software</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-primary: #0f172a;
+            --bg-surface: #1e293b;
+            --accent: #6366f1;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --border: #334155;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background-color: var(--bg-primary); color: var(--text-primary); min-height: 100vh; }
+        
+        .app-container { display: flex; min-height: 100vh; flex-direction: row; }
+
+        /* Responsive Sidebar */
+        .sidebar {
+            width: 260px; background-color: var(--bg-surface);
+            border-right: 1px solid var(--border); padding: 1.5rem;
+            display: flex; flex-direction: column; flex-shrink: 0; z-index: 100;
+        }
+        .brand { display: flex; align-items: center; gap: 10px; margin-bottom: 2rem; }
+        .brand-icon { font-size: 1.8rem; color: var(--accent); }
+        .brand h2 { font-size: 1.2rem; }
+        .brand span { color: var(--accent); }
+
+        .nav-menu { display: flex; flex-direction: column; gap: 8px; }
+        .nav-item {
+            background: none; border: none; color: var(--text-secondary);
+            padding: 12px 16px; text-align: left; border-radius: 8px;
+            cursor: pointer; font-size: 0.95rem; display: flex; align-items: center; gap: 12px;
+            transition: all 0.2s ease;
+        }
+        .nav-item:hover, .nav-item.active { background-color: var(--accent); color: white; }
+
+        /* Main Content */
+        .main-content { flex: 1; padding: 1.5rem; overflow-y: auto; width: 100%; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .page-header { margin-bottom: 1.5rem; }
+        .page-header h1 { font-size: 1.5rem; font-weight: 700; }
+        .page-header p { color: var(--text-secondary); font-size: 0.85rem; margin-top: 4px; }
+
+        .glass-card {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid var(--border);
+            border-radius: 12px; padding: 1.2rem;
+            backdrop-filter: blur(10px); margin-bottom: 1.5rem;
+        }
+        
+        /* Form Grids */
+        .form-grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; }
+        .form-grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; }
+        .full-width { grid-column: 1 / -1; }
+
+        .input-group { display: flex; flex-direction: column; gap: 6px; position: relative; }
+        .input-group label { font-size: 0.85rem; color: var(--text-secondary); font-weight: 500; }
+
+        input, textarea, select {
+            background: var(--bg-primary); border: 1px solid var(--border);
+            color: var(--text-primary); padding: 10px 12px; border-radius: 6px;
+            outline: none; width: 100%; font-size: 0.9rem;
+        }
+        input:focus, textarea:focus, select:focus { border-color: var(--accent); }
+
+        /* Custom Keyboard Dropdown Container */
+        .dropdown-results {
+            position: absolute; top: 100%; left: 0; right: 0;
+            background: var(--bg-surface); border: 1px solid var(--accent);
+            border-radius: 6px; max-height: 220px; overflow-y: auto;
+            z-index: 999; display: none; margin-top: 4px; box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+        }
+        .dropdown-item {
+            padding: 10px 14px; cursor: pointer; border-bottom: 1px solid var(--border);
+            font-size: 0.88rem;
+        }
+        .dropdown-item:last-child { border-bottom: none; }
+        .dropdown-item.active, .dropdown-item:hover {
+            background-color: var(--accent); color: white;
+        }
+
+        /* Tables Responsive */
+        .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .data-table { width: 100%; border-collapse: collapse; margin-top: 1rem; min-width: 650px; }
+        .data-table th, .data-table td { padding: 10px; text-align: left; border-bottom: 1px solid var(--border); font-size: 0.88rem; }
+        .data-table th { color: var(--text-secondary); font-size: 0.8rem; background: var(--bg-surface); }
+
+        /* Buttons */
+        .btn {
+            padding: 10px 16px; border: none; border-radius: 6px; cursor: pointer;
+            font-weight: 600; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            transition: opacity 0.2s ease; font-size: 0.9rem;
+        }
+        .btn:hover { opacity: 0.9; }
+        .btn-primary { background: var(--accent); color: white; }
+        .btn-secondary { background: var(--border); color: white; }
+        .btn-success { background: var(--success); color: white; }
+        .btn-warning { background: var(--warning); color: white; padding: 6px 10px; font-size: 0.8rem; }
+        .btn-danger { background: var(--danger); color: white; padding: 6px 10px; font-size: 0.8rem; }
+
+        .action-btns { display: flex; gap: 6px; }
+        .summary-box { margin-top: 1.5rem; text-align: right; line-height: 1.8; }
+        .summary-box h3 { color: var(--accent); font-size: 1.3rem; margin-top: 5px; }
+
+        /* Custom Toast Notification */
+        #toast-container {
+            position: fixed; bottom: 20px; right: 20px; z-index: 9999;
+            display: flex; flex-direction: column; gap: 10px;
+        }
+        .toast {
+            min-width: 280px; padding: 12px 20px; border-radius: 8px; color: white;
+            font-weight: 500; font-size: 0.9rem; display: flex; align-items: center; gap: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3); animation: slideIn 0.3s ease-in-out;
+        }
+        .toast-success { background: var(--success); }
+        .toast-danger { background: var(--danger); }
+        .toast-warning { background: var(--warning); color: #000; }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* Modal Preview */
+        .modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); justify-content: center; align-items: center; z-index: 2000;
+            padding: 10px;
+        }
+        .modal-content {
+            background: white; color: black; padding: 0; border-radius: 8px;
+            width: 100%; max-width: 850px; height: 92vh; display: flex; flex-direction: column;
+        }
+        .modal-body { flex: 1; overflow-y: auto; padding: 20px; }
+        .modal-actions { padding: 15px; border-top: 1px solid #ccc; background: #f8fafc; display: flex; gap: 10px; justify-content: flex-end; }
+
+        /* Responsive Design Rules */
+        @media (max-width: 768px) {
+            .app-container { flex-direction: column; }
+            .sidebar { width: 100%; padding: 1rem; border-right: none; border-bottom: 1px solid var(--border); }
+            .nav-menu { flex-direction: row; overflow-x: auto; padding-bottom: 5px; }
+            .nav-item { white-space: nowrap; padding: 8px 12px; font-size: 0.85rem; }
+            .main-content { padding: 1rem; }
+        }
+
+        /* Print A4 Styling & Page Break Rules */
+        @media print {
+            body * { visibility: hidden; }
+            .print-area, .print-area * { visibility: visible; }
+            .print-area { position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 0; }
+            .no-print { display: none !important; }
+            @page { size: A4; margin: 12mm; }
+            .page-break { page-break-after: always; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- Responsive Navigation Bar -->
+        <aside class="sidebar">
+            <div class="brand">
+                <i class="fa-solid fa-file-invoice-dollar brand-icon"></i>
+                <h2>ProBilling <span>ERP</span></h2>
+            </div>
+            <nav class="nav-menu">
+                <button class="nav-item active" onclick="switchTab('company', this)"><i class="fa-solid fa-building"></i> Company Setup</button>
+                <button class="nav-item" onclick="switchTab('party-master', this)"><i class="fa-solid fa-users"></i> Party Master</button>
+                <button class="nav-item" onclick="switchTab('item-master', this)"><i class="fa-solid fa-boxes-stacked"></i> Item Master</button>
+                <button class="nav-item" onclick="switchTab('billing', this)"><i class="fa-solid fa-receipt"></i> Create Voucher</button>
+                <button class="nav-item" onclick="switchTab('history', this)"><i class="fa-solid fa-history"></i> Voucher History</button>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            
+            <!-- 1. Company Setup Section -->
+            <section id="company" class="tab-content active">
+                <header class="page-header">
+                    <h1>Company Profile Setup</h1>
+                    <p>अपनी फर्म डिटेल्स एवं इन्वॉइस नंबरिंग रूल सेट करें</p>
+                </header>
+                <form id="company-form" class="glass-card">
+                    <div class="form-grid-3">
+                        <div class="input-group">
+                            <label>Company Name *</label>
+                            <input type="text" id="comp-name" placeholder="Business Name" required>
+                        </div>
+                        <div class="input-group">
+                            <label>GSTIN Number</label>
+                            <input type="text" id="comp-gst" placeholder="07AAAAA0000A1Z5" oninput="autoSelectStateFromGST(this.value, 'comp-state')">
+                        </div>
+                        <div class="input-group">
+                            <label>State & State Code Dropdown *</label>
+                            <select id="comp-state" class="state-select" required></select>
+                        </div>
+                        <div class="input-group">
+                            <label>Invoice Numbering Type</label>
+                            <select id="inv-num-type" onchange="toggleInvSetup(this.value)">
+                                <option value="auto">Automatic</option>
+                                <option value="manual">Manual</option>
+                            </select>
+                        </div>
+                        <div class="input-group inv-auto-field">
+                            <label>Invoice Prefix (e.g. INV/24-25/)</label>
+                            <input type="text" id="inv-prefix" placeholder="INV/">
+                        </div>
+                        <div class="input-group inv-auto-field">
+                            <label>Starting Invoice Number</label>
+                            <input type="number" id="inv-start-no" value="1" min="1">
+                        </div>
+                        <div class="input-group">
+                            <label>Mobile Number</label>
+                            <input type="tel" id="comp-phone" placeholder="+91 9876543210">
+                        </div>
+                        <div class="input-group">
+                            <label>Email Address</label>
+                            <input type="email" id="comp-email" placeholder="contact@acme.com">
+                        </div>
+                        <div class="input-group">
+                            <label>Pincode</label>
+                            <input type="text" id="comp-pincode" placeholder="Pincode">
+                        </div>
+                        <div class="input-group full-width">
+                            <label>Business Address</label>
+                            <textarea id="comp-address" rows="2" placeholder="Full Address"></textarea>
+                        </div>
+                        <div class="input-group full-width">
+                            <label>Bank Details for Invoice Footer</label>
+                            <textarea id="comp-bank" rows="2" placeholder="Bank Name, A/c Number, IFSC Code"></textarea>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="margin-top:1rem;"><i class="fa-solid fa-floppy-disk"></i> Save Profile Setup</button>
+                </form>
+            </section>
+
+            <!-- 2. Party Master Section -->
+            <section id="party-master" class="tab-content">
+                <header class="page-header">
+                    <h1>Party Master Setup</h1>
+                    <p>ग्राहक एवं विक्रेता का खाता प्रबंधित करें</p>
+                </header>
+                <form id="party-form" class="glass-card">
+                    <input type="hidden" id="pm-id">
+                    <div class="form-grid-3">
+                        <div class="input-group">
+                            <label>Party Name *</label>
+                            <input type="text" id="pm-name" placeholder="Party Legal Name" required>
+                        </div>
+                        <div class="input-group">
+                            <label>GSTIN Number</label>
+                            <input type="text" id="pm-gst" placeholder="15 Digit GSTIN" oninput="autoSelectStateFromGST(this.value, 'pm-state')">
+                        </div>
+                        <div class="input-group">
+                            <label>State & State Code Dropdown *</label>
+                            <select id="pm-state" class="state-select" required></select>
+                        </div>
+                        <div class="input-group">
+                            <label>Mobile Number</label>
+                            <input type="tel" id="pm-phone" placeholder="Phone Number">
+                        </div>
+                        <div class="input-group">
+                            <label>Email Address</label>
+                            <input type="email" id="pm-email" placeholder="email@party.com">
+                        </div>
+                        <div class="input-group full-width">
+                            <label>Full Address</label>
+                            <textarea id="pm-address" rows="2" placeholder="Full Address"></textarea>
+                        </div>
+                    </div>
+                    <div style="margin-top: 1rem; display: flex; gap: 10px;">
+                        <button type="submit" id="pm-submit-btn" class="btn btn-primary"><i class="fa-solid fa-user-plus"></i> Save Party</button>
+                        <button type="button" id="pm-cancel-btn" class="btn btn-secondary" style="display:none;" onclick="resetPartyForm()">Cancel Edit</button>
+                    </div>
+                </form>
+
+                <div class="glass-card">
+                    <h3>Saved Party List</h3>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr><th>Party Name</th><th>GSTIN</th><th>State & Code</th><th>Phone</th><th>Action</th></tr>
+                            </thead>
+                            <tbody id="party-master-list"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3. Item Master Section -->
+            <section id="item-master" class="tab-content">
+                <header class="page-header">
+                    <h1>Item Master Setup</h1>
+                    <p>सामान एवं सेवाओं का मास्टर रिकॉर्ड प्रबंधन</p>
+                </header>
+                <form id="item-form" class="glass-card">
+                    <input type="hidden" id="im-id">
+                    <div class="form-grid-3">
+                        <div class="input-group">
+                            <label>Item Description *</label>
+                            <input type="text" id="im-name" placeholder="Item Name" required>
+                        </div>
+                        <div class="input-group">
+                            <label>HSN / SAC Code *</label>
+                            <input type="text" id="im-hsn" placeholder="e.g. 8471" required>
+                        </div>
+                        <div class="input-group">
+                            <label>Unit of Measurement (UOM)</label>
+                            <select id="im-unit">
+                                <option value="Pcs">Pcs (Pieces)</option>
+                                <option value="Nos">Nos (Numbers)</option>
+                                <option value="Kg">Kg (Kilograms)</option>
+                                <option value="Mtr">Mtr (Meters)</option>
+                                <option value="Box">Box</option>
+                                <option value="Set">Set</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label>Selling Price (₹) *</label>
+                            <input type="number" id="im-price" placeholder="0.00" required step="0.01">
+                        </div>
+                        <div class="input-group">
+                            <label>GST Rate (%)</label>
+                            <select id="im-gst">
+                                <option value="0">0%</option>
+                                <option value="5">5%</option>
+                                <option value="12">12%</option>
+                                <option value="18" selected>18%</option>
+                                <option value="28">28%</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div style="margin-top: 1rem; display: flex; gap: 10px;">
+                        <button type="submit" id="im-submit-btn" class="btn btn-primary"><i class="fa-solid fa-box-archive"></i> Save Item</button>
+                        <button type="button" id="im-cancel-btn" class="btn btn-secondary" style="display:none;" onclick="resetItemForm()">Cancel Edit</button>
+                    </div>
+                </form>
+
+                <div class="glass-card">
+                    <h3>Saved Item Master List</h3>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr><th>Item Name</th><th>HSN/SAC</th><th>Unit</th><th>Selling Price</th><th>GST %</th><th>Action</th></tr>
+                            </thead>
+                            <tbody id="item-master-list"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4. Create Voucher Section -->
+            <section id="billing" class="tab-content">
+                <header class="page-header">
+                    <h1>Create Invoice / Voucher</h1>
+                    <p>Spacebar दबाएं सभी Party/Items लिस्ट देखने के लिए (Arrow keys & Enter सपोर्टेड)</p>
+                </header>
+
+                <div class="glass-card">
+                    <input type="hidden" id="editing-voucher-id">
+                    <div class="form-grid-3" style="margin-bottom:1rem;">
+                        <div class="input-group">
+                            <label>Invoice Number</label>
+                            <input type="text" id="voucher-no" placeholder="Auto Generated">
+                        </div>
+                        <div class="input-group">
+                            <label>Invoice Date</label>
+                            <input type="date" id="voucher-date">
+                        </div>
+                    </div>
+
+                    <div class="form-grid-2">
+                        <!-- Custom Smart Keyboard Party Dropdown -->
+                        <div class="input-group">
+                            <label>Search & Select Party (Press Spacebar for All List)</label>
+                            <input type="text" id="client-name" placeholder="Press Space or Type..." autocomplete="off" oninput="filterParties(this.value)" onkeydown="handlePartyKeydown(event)">
+                            <div id="party-dropdown-list" class="dropdown-results"></div>
+                        </div>
+
+                        <div class="input-group">
+                            <label>Customer GSTIN</label>
+                            <input type="text" id="client-gst" placeholder="GSTIN" readonly>
+                        </div>
+                        <div class="input-group">
+                            <label>State & State Code</label>
+                            <input type="text" id="client-state-display" placeholder="State Name (Code)" readonly>
+                            <input type="hidden" id="client-state-code">
+                        </div>
+                        <div class="input-group">
+                            <label>Address</label>
+                            <input type="text" id="client-address" placeholder="Address" readonly>
+                        </div>
+                    </div>
+
+                    <!-- Line Items Table -->
+                    <div class="table-responsive" style="margin-top:1.5rem;">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 32%;">Item Description (Search or Spacebar)</th>
+                                    <th style="width: 12%;">HSN/SAC</th>
+                                    <th style="width: 10%;">Unit</th>
+                                    <th style="width: 10%;">Qty</th>
+                                    <th style="width: 12%;">Price (₹)</th>
+                                    <th style="width: 10%;">GST (%)</th>
+                                    <th style="width: 12%;">Total (₹)</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="line-items"></tbody>
+                        </table>
+                    </div>
+                    <button class="btn btn-secondary" style="margin-top: 1rem;" onclick="addItemRow()"><i class="fa-solid fa-plus"></i> Add Item Line</button>
+
+                    <!-- Summary & Auto Round-Off -->
+                    <div class="summary-box">
+                        <p>Taxable Value: <span id="sub-total">₹0.00</span></p>
+                        <p id="tax-type-label">GST Tax Amount: <span id="gst-total">₹0.00</span></p>
+                        <p>Round Off (+/-): <span id="round-off">₹0.00</span></p>
+                        <h3>Grand Total: <span id="grand-total">₹0.00</span></h3>
+                    </div>
+
+                    <div style="margin-top: 1.5rem; display: flex; gap: 10px;">
+                        <button class="btn btn-success" id="save-voucher-btn" onclick="saveDocument()"><i class="fa-solid fa-check-double"></i> Save & Generate Bill</button>
+                        <button class="btn btn-secondary" onclick="clearVoucherForm()"><i class="fa-solid fa-rotate-right"></i> Reset Form</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 5. Voucher History Section -->
+            <section id="history" class="tab-content">
+                <header class="page-header">
+                    <h1>Voucher History</h1>
+                    <p>पुराने सभी बिल देखें, एडिट करें या डिलीट करें</p>
+                </header>
+                <div class="glass-card table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr><th>Date</th><th>Voucher No.</th><th>Party Name</th><th>Grand Total</th><th>Action</th></tr>
+                        </thead>
+                        <tbody id="history-list"></tbody>
+                    </table>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Notification Toast Container -->
+    <div id="toast-container"></div>
+
+    <!-- Modal for A4 Invoice Print -->
+    <div id="print-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-body print-area" id="invoice-preview"></div>
+            <div class="modal-actions no-print">
+                <button onclick="window.print()" class="btn btn-primary"><i class="fa-solid fa-print"></i> Print Invoice (A4)</button>
+                <button onclick="closeModal()" class="btn btn-secondary">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const gstStates = [
+            { code: "01", name: "Jammu and Kashmir" }, { code: "02", name: "Himachal Pradesh" },
+            { code: "03", name: "Punjab" }, { code: "04", name: "Chandigarh" },
+            { code: "05", name: "Uttarakhand" }, { code: "06", name: "Haryana" },
+            { code: "07", name: "Delhi" }, { code: "08", name: "Rajasthan" },
+            { code: "09", name: "Uttar Pradesh" }, { code: "10", name: "Bihar" },
+            { code: "11", name: "Sikkim" }, { code: "12", name: "Arunachal Pradesh" },
+            { code: "13", name: "Nagaland" }, { code: "14", name: "Manipur" },
+            { code: "15", name: "Mizoram" }, { code: "16", name: "Tripura" },
+            { code: "17", name: "Meghalaya" }, { code: "18", name: "Assam" },
+            { code: "19", name: "West Bengal" }, { code: "20", name: "Jharkhand" },
+            { code: "21", name: "Odisha" }, { code: "22", name: "Chhattisgarh" },
+            { code: "23", name: "Madhya Pradesh" }, { code: "24", name: "Gujarat" },
+            { code: "27", name: "Maharashtra" }, { code: "29", name: "Karnataka" },
+            { code: "32", name: "Kerala" }, { code: "33", name: "Tamil Nadu" },
+            { code: "36", name: "Telangana" }, { code: "37", name: "Andhra Pradesh" }
+        ];
+
+        let db;
+        let partiesData = [];
+        let itemsData = [];
+        let partyFocusIndex = -1;
+
+        // Toast Alert Function
+        function showToast(msg, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            const icon = type === 'success' ? 'fa-circle-check' : (type === 'danger' ? 'fa-circle-xmark' : 'fa-triangle-exclamation');
+            toast.innerHTML = `<i class="fa-solid ${icon}"></i> <span>${msg}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3500);
+        }
+
+        // DB Initialization
+        const request = indexedDB.open("ProBillingERPDB_V6", 1);
+        request.onupgradeneeded = (e) => {
+            db = e.target.result;
+            if (!db.objectStoreNames.contains("company")) db.createObjectStore("company", { keyPath: "id" });
+            if (!db.objectStoreNames.contains("parties")) db.createObjectStore("parties", { keyPath: "id", autoIncrement: true });
+            if (!db.objectStoreNames.contains("items")) db.createObjectStore("items", { keyPath: "id", autoIncrement: true });
+            if (!db.objectStoreNames.contains("invoices")) db.createObjectStore("invoices", { keyPath: "id", autoIncrement: true });
+        };
+
+        request.onsuccess = (e) => {
+            db = e.target.result;
+            populateStateDropdowns();
+            loadCompanyData();
+            loadParties();
+            loadItems();
+            document.getElementById('voucher-date').valueAsDate = new Date();
+        };
+
+        function populateStateDropdowns() {
+            document.querySelectorAll('.state-select').forEach(select => {
+                select.innerHTML = '<option value="">-- Select State & Code --</option>';
+                gstStates.forEach(st => {
+                    select.innerHTML += `<option value="${st.code}">${st.code} - ${st.name}</option>`;
+                });
+            });
+        }
+
+        function autoSelectStateFromGST(gstVal, selectId) {
+            if(gstVal && gstVal.length >= 2) {
+                const code = gstVal.substring(0, 2);
+                const select = document.getElementById(selectId);
+                if(select) select.value = code;
+            }
+        }
+
+        function switchTab(tabId, btn) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            btn.classList.add('active');
+            if(tabId === 'billing' && !document.getElementById('editing-voucher-id').value) generateVoucherNumber();
+            if(tabId === 'history') loadHistory();
+        }
+
+        function toggleInvSetup(val) {
+            const fields = document.querySelectorAll('.inv-auto-field');
+            fields.forEach(f => f.style.display = (val === 'manual') ? 'none' : 'flex');
+        }
+
+        // Company Setup
+        document.getElementById('company-form').onsubmit = (e) => {
+            e.preventDefault();
+            const data = {
+                id: "profile",
+                name: document.getElementById('comp-name').value,
+                gst: document.getElementById('comp-gst').value,
+                stateCode: document.getElementById('comp-state').value,
+                invNumType: document.getElementById('inv-num-type').value,
+                invPrefix: document.getElementById('inv-prefix').value,
+                invStartNo: parseInt(document.getElementById('inv-start-no').value) || 1,
+                phone: document.getElementById('comp-phone').value,
+                email: document.getElementById('comp-email').value,
+                pincode: document.getElementById('comp-pincode').value,
+                address: document.getElementById('comp-address').value,
+                bank: document.getElementById('comp-bank').value
+            };
+            const tx = db.transaction("company", "readwrite");
+            tx.objectStore("company").put(data);
+            showToast("Company Profile Saved Successfully!");
+        };
+
+        function loadCompanyData() {
+            const tx = db.transaction("company", "readonly");
+            tx.objectStore("company").get("profile").onsuccess = (e) => {
+                const res = e.target.result;
+                if(res) {
+                    document.getElementById('comp-name').value = res.name || '';
+                    document.getElementById('comp-gst').value = res.gst || '';
+                    document.getElementById('comp-state').value = res.stateCode || '';
+                    document.getElementById('inv-num-type').value = res.invNumType || 'auto';
+                    document.getElementById('inv-prefix').value = res.invPrefix || 'INV/';
+                    document.getElementById('inv-start-no').value = res.invStartNo || 1;
+                    document.getElementById('comp-phone').value = res.phone || '';
+                    document.getElementById('comp-email').value = res.email || '';
+                    document.getElementById('comp-pincode').value = res.pincode || '';
+                    document.getElementById('comp-address').value = res.address || '';
+                    document.getElementById('comp-bank').value = res.bank || '';
+                    toggleInvSetup(res.invNumType || 'auto');
+                }
+            };
+        }
+
+        function generateVoucherNumber() {
+            const txComp = db.transaction("company", "readonly");
+            txComp.objectStore("company").get("profile").onsuccess = (e) => {
+                const comp = e.target.result || {};
+                const input = document.getElementById('voucher-no');
+
+                if (comp.invNumType === 'manual') {
+                    input.readOnly = false;
+                    input.placeholder = "Enter Manual Invoice No.";
+                    input.value = "";
+                } else {
+                    input.readOnly = true;
+                    const prefix = comp.invPrefix || 'INV/';
+                    const startNo = comp.invStartNo || 1;
+
+                    const txInv = db.transaction("invoices", "readonly");
+                    const store = txInv.objectStore("invoices");
+                    let count = 0;
+                    
+                    store.openCursor().onsuccess = (ev) => {
+                        const cursor = ev.target.result;
+                        if(cursor) { count++; cursor.continue(); }
+                        else {
+                            input.value = `${prefix}${startNo + count}`;
+                        }
+                    };
+                }
+            };
+        }
+
+        // Party Master
+        document.getElementById('party-form').onsubmit = (e) => {
+            e.preventDefault();
+            const id = document.getElementById('pm-id').value;
+            const party = {
+                name: document.getElementById('pm-name').value,
+                gst: document.getElementById('pm-gst').value,
+                stateCode: document.getElementById('pm-state').value,
+                phone: document.getElementById('pm-phone').value,
+                email: document.getElementById('pm-email').value,
+                address: document.getElementById('pm-address').value
+            };
+
+            const tx = db.transaction("parties", "readwrite");
+            if(id) { party.id = parseInt(id); tx.objectStore("parties").put(party); } 
+            else { tx.objectStore("parties").add(party); }
+
+            tx.oncomplete = () => {
+                showToast(id ? "Party Updated!" : "Party Saved!");
+                resetPartyForm();
+                loadParties();
+            };
+        };
+
+        function loadParties() {
+            partiesData = [];
+            const tbody = document.getElementById('party-master-list');
+            tbody.innerHTML = "";
+            const tx = db.transaction("parties", "readonly");
+            tx.objectStore("parties").openCursor().onsuccess = (e) => {
+                const cursor = e.target.result;
+                if(cursor) {
+                    const data = cursor.value;
+                    partiesData.push(data);
+                    const st = gstStates.find(s => s.code === data.stateCode);
+                    tbody.innerHTML += `
+                        <tr>
+                            <td><strong>${data.name}</strong></td>
+                            <td>${data.gst || 'Unregistered'}</td>
+                            <td>${data.stateCode || '-'} - ${st ? st.name : ''}</td>
+                            <td>${data.phone || '-'}</td>
+                            <td class="action-btns">
+                                <button class="btn btn-warning" onclick="editParty(${data.id})"><i class="fa-solid fa-pen"></i></button>
+                                <button class="btn btn-danger" onclick="deleteParty(${data.id})"><i class="fa-solid fa-trash"></i></button>
+                            </td>
+                        </tr>
+                    `;
+                    cursor.continue();
+                }
+            };
+        }
+
+        function editParty(id) {
+            const p = partiesData.find(x => x.id === id);
+            if(p) {
+                document.getElementById('pm-id').value = p.id;
+                document.getElementById('pm-name').value = p.name;
+                document.getElementById('pm-gst').value = p.gst || '';
+                document.getElementById('pm-state').value = p.stateCode || '';
+                document.getElementById('pm-phone').value = p.phone || '';
+                document.getElementById('pm-email').value = p.email || '';
+                document.getElementById('pm-address').value = p.address || '';
+                document.getElementById('pm-submit-btn').innerHTML = `<i class="fa-solid fa-pen-to-square"></i> Update Party`;
+                document.getElementById('pm-cancel-btn').style.display = "inline-flex";
+            }
+        }
+
+        function deleteParty(id) {
+            if(confirm("Delete this party?")) {
+                const tx = db.transaction("parties", "readwrite");
+                tx.objectStore("parties").delete(id);
+                tx.oncomplete = () => { showToast("Party Deleted", "danger"); loadParties(); };
+            }
+        }
+
+        function resetPartyForm() {
+            document.getElementById('party-form').reset();
+            document.getElementById('pm-id').value = "";
+            document.getElementById('pm-submit-btn').innerHTML = `<i class="fa-solid fa-user-plus"></i> Save Party`;
+            document.getElementById('pm-cancel-btn').style.display = "none";
+        }
+
+        // --- Custom Party Search Dropdown with Spacebar Support ---
+        function filterParties(val) {
+            const listContainer = document.getElementById('party-dropdown-list');
+            listContainer.innerHTML = "";
+            partyFocusIndex = -1;
+
+            const searchKey = val.trim().toLowerCase();
+            const filtered = searchKey === "" ? partiesData : partiesData.filter(p => p.name.toLowerCase().includes(searchKey));
+
+            if(filtered.length === 0) { listContainer.style.display = "none"; return; }
+
+            filtered.forEach((p) => {
+                const item = document.createElement('div');
+                item.className = 'dropdown-item';
+                item.innerText = `${p.name} ${p.gst ? '(GST: ' + p.gst + ')' : ''}`;
+                item.onclick = () => selectParty(p);
+                listContainer.appendChild(item);
+            });
+
+            listContainer.style.display = "block";
+        }
+
+        function handlePartyKeydown(e) {
+            const listContainer = document.getElementById('party-dropdown-list');
+            const items = listContainer.getElementsByClassName('dropdown-item');
+
+            if (e.key === " " && e.target.value === "") {
+                filterParties("");
+                e.preventDefault();
+            } else if (e.key === "ArrowDown") {
+                partyFocusIndex++;
+                if (partyFocusIndex >= items.length) partyFocusIndex = 0;
+                setActiveItem(items, partyFocusIndex);
+                e.preventDefault();
+            } else if (e.key === "ArrowUp") {
+                partyFocusIndex--;
+                if (partyFocusIndex < 0) partyFocusIndex = items.length - 1;
+                setActiveItem(items, partyFocusIndex);
+                e.preventDefault();
+            } else if (e.key === "Enter") {
+                e.preventDefault();
+                if (partyFocusIndex > -1 && items[partyFocusIndex]) {
+                    items[partyFocusIndex].click();
+                }
+            } else if (e.key === "Escape") {
+                listContainer.style.display = "none";
+            }
+        }
+
+        function selectParty(p) {
+            document.getElementById('client-name').value = p.name;
+            document.getElementById('client-gst').value = p.gst || 'N/A';
+            const st = gstStates.find(s => s.code === p.stateCode);
+            document.getElementById('client-state-display').value = `${st ? st.name : ''} (Code: ${p.stateCode || '-'})`;
+            document.getElementById('client-state-code').value = p.stateCode || '';
+            document.getElementById('client-address').value = p.address ? p.address.replace(/\n/g, ' ') : '';
+            document.getElementById('party-dropdown-list').style.display = "none";
+            calculateTotals();
+        }
+
+        // Item Master
+        document.getElementById('item-form').onsubmit = (e) => {
+            e.preventDefault();
+            const id = document.getElementById('im-id').value;
+            const item = {
+                name: document.getElementById('im-name').value,
+                hsn: document.getElementById('im-hsn').value,
+                unit: document.getElementById('im-unit').value,
+                price: parseFloat(document.getElementById('im-price').value) || 0,
+                gst: document.getElementById('im-gst').value
+            };
+
+            const tx = db.transaction("items", "readwrite");
+            if(id) { item.id = parseInt(id); tx.objectStore("items").put(item); } 
+            else { tx.objectStore("items").add(item); }
+
+            tx.oncomplete = () => {
+                showToast(id ? "Item Updated!" : "Item Saved!");
+                resetItemForm();
+                loadItems();
+            };
+        };
+
+        function loadItems() {
+            itemsData = [];
+            const tbody = document.getElementById('item-master-list');
+            tbody.innerHTML = "";
+
+            const tx = db.transaction("items", "readonly");
+            tx.objectStore("items").openCursor().onsuccess = (e) => {
+                const cursor = e.target.result;
+                if(cursor) {
+                    const data = cursor.value;
+                    itemsData.push(data);
+                    tbody.innerHTML += `
+                        <tr>
+                            <td><strong>${data.name}</strong></td>
+                            <td>${data.hsn}</td>
+                            <td>${data.unit}</td>
+                            <td>₹${data.price.toFixed(2)}</td>
+                            <td>${data.gst}%</td>
+                            <td class="action-btns">
+                                <button class="btn btn-warning" onclick="editItem(${data.id})"><i class="fa-solid fa-pen"></i></button>
+                                <button class="btn btn-danger" onclick="deleteItem(${data.id})"><i class="fa-solid fa-trash"></i></button>
+                            </td>
+                        </tr>
+                    `;
+                    cursor.continue();
+                }
+            };
+        }
+
+        function editItem(id) {
+            const i = itemsData.find(x => x.id === id);
+            if(i) {
+                document.getElementById('im-id').value = i.id;
+                document.getElementById('im-name').value = i.name;
+                document.getElementById('im-hsn').value = i.hsn;
+                document.getElementById('im-unit').value = i.unit;
+                document.getElementById('im-price').value = i.price;
+                document.getElementById('im-gst').value = i.gst;
+                document.getElementById('im-submit-btn').innerHTML = `<i class="fa-solid fa-pen-to-square"></i> Update Item`;
+                document.getElementById('im-cancel-btn').style.display = "inline-flex";
+            }
+        }
+
+        function deleteItem(id) {
+            if(confirm("Delete item?")) {
+                const tx = db.transaction("items", "readwrite");
+                tx.objectStore("items").delete(id);
+                tx.oncomplete = () => { showToast("Item Deleted", "danger"); loadItems(); };
+            }
+        }
+
+        function resetItemForm() {
+            document.getElementById('item-form').reset();
+            document.getElementById('im-id').value = "";
+            document.getElementById('im-submit-btn').innerHTML = `<i class="fa-solid fa-box-archive"></i> Save Item`;
+            document.getElementById('im-cancel-btn').style.display = "none";
+        }
+
+        // --- Line Item Smart Keyboard Dropdown ---
+        function addItemRow(data = null) {
+            const tbody = document.getElementById('line-items');
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td style="position:relative;">
+                    <input type="text" class="item-desc" placeholder="Press Space or Type..." value="${data ? data.desc : ''}" autocomplete="off" required oninput="filterLineItems(this)" onkeydown="handleItemKeydown(event, this)">
+                    <div class="dropdown-results item-dropdown-list"></div>
+                </td>
+                <td><input type="text" class="item-hsn" placeholder="HSN" value="${data ? data.hsn : ''}"></td>
+                <td><input type="text" class="item-unit" value="${data ? data.unit : 'Pcs'}"></td>
+                <td><input type="number" class="item-qty" value="${data ? data.qty : '1'}" min="1" oninput="calculateTotals()"></td>
+                <td><input type="number" class="item-price" value="${data ? data.price : '0'}" step="0.01" oninput="calculateTotals()"></td>
+                <td>
+                    <select class="item-gst" onchange="calculateTotals()">
+                        <option value="0" ${data && data.gst == 0 ? 'selected' : ''}>0%</option>
+                        <option value="5" ${data && data.gst == 5 ? 'selected' : ''}>5%</option>
+                        <option value="12" ${data && data.gst == 12 ? 'selected' : ''}>12%</option>
+                        <option value="18" ${!data || data.gst == 18 ? 'selected' : ''}>18%</option>
+                        <option value="28" ${data && data.gst == 28 ? 'selected' : ''}>28%</option>
+                    </select>
+                </td>
+                <td class="item-total">₹0.00</td>
+                <td><button class="btn btn-danger" onclick="this.closest('tr').remove(); calculateTotals();"><i class="fa-solid fa-trash"></i></button></td>
+            `;
+            tbody.appendChild(tr);
+            calculateTotals();
+        }
+
+        function filterLineItems(inputEl) {
+            const row = inputEl.closest('td');
+            const listContainer = row.querySelector('.item-dropdown-list');
+            listContainer.innerHTML = "";
+            inputEl.focusIndex = -1;
+
+            const searchKey = inputEl.value.trim().toLowerCase();
+            const filtered = searchKey === "" ? itemsData : itemsData.filter(i => i.name.toLowerCase().includes(searchKey));
+
+            if(filtered.length === 0) { listContainer.style.display = "none"; return; }
+
+            filtered.forEach((itemObj) => {
+                const item = document.createElement('div');
+                item.className = 'dropdown-item';
+                item.innerText = `${itemObj.name} (₹${itemObj.price} | GST: ${itemObj.gst}%)`;
+                item.onclick = () => selectLineItem(inputEl, itemObj);
+                listContainer.appendChild(item);
+            });
+
+            listContainer.style.display = "block";
+        }
+
+        function handleItemKeydown(e, inputEl) {
+            const row = inputEl.closest('td');
+            const listContainer = row.querySelector('.item-dropdown-list');
+            const items = listContainer.getElementsByClassName('dropdown-item');
+            if (inputEl.focusIndex === undefined) inputEl.focusIndex = -1;
+
+            if (e.key === " " && inputEl.value === "") {
+                filterLineItems(inputEl);
+                e.preventDefault();
+            } else if (e.key === "ArrowDown") {
+                inputEl.focusIndex++;
+                if (inputEl.focusIndex >= items.length) inputEl.focusIndex = 0;
+                setActiveItem(items, inputEl.focusIndex);
+                e.preventDefault();
+            } else if (e.key === "ArrowUp") {
+                inputEl.focusIndex--;
+                if (inputEl.focusIndex < 0) inputEl.focusIndex = items.length - 1;
+                setActiveItem(items, inputEl.focusIndex);
+                e.preventDefault();
+            } else if (e.key === "Enter") {
+                e.preventDefault();
+                if (inputEl.focusIndex > -1 && items[inputEl.focusIndex]) {
+                    items[inputEl.focusIndex].click();
+                }
+            } else if (e.key === "Escape") {
+                listContainer.style.display = "none";
+            }
+        }
+
+        function selectLineItem(inputEl, itemObj) {
+            const row = inputEl.closest('tr');
+            inputEl.value = itemObj.name;
+            row.querySelector('.item-hsn').value = itemObj.hsn;
+            row.querySelector('.item-unit').value = itemObj.unit;
+            row.querySelector('.item-price').value = itemObj.price;
+            row.querySelector('.item-gst').value = itemObj.gst;
+            row.querySelector('.item-dropdown-list').style.display = "none";
+            calculateTotals();
+        }
+
+        function setActiveItem(items, index) {
+            for (let i = 0; i < items.length; i++) items[i].classList.remove('active');
+            if (index > -1 && items[index]) {
+                items[index].classList.add('active');
+                items[index].scrollIntoView({ block: 'nearest' });
+            }
+        }
+
+        // Global Click to Close Dropdowns
+        document.addEventListener('click', (e) => {
+            if(!e.target.closest('.input-group') && !e.target.closest('td')) {
+                document.querySelectorAll('.dropdown-results').forEach(d => d.style.display = "none");
+            }
+        });
+
+        // Voucher Calculation & Round Off
+        function calculateTotals() {
+            let subtotal = 0;
+            let totalGst = 0;
+
+            document.querySelectorAll('#line-items tr').forEach(row => {
+                const qty = parseFloat(row.querySelector('.item-qty').value) || 0;
+                const price = parseFloat(row.querySelector('.item-price').value) || 0;
+                const gstRate = parseFloat(row.querySelector('.item-gst').value) || 0;
+
+                const rowSubtotal = qty * price;
+                const gstAmount = rowSubtotal * (gstRate / 100);
+
+                row.querySelector('.item-total').innerText = `₹${(rowSubtotal + gstAmount).toFixed(2)}`;
+                subtotal += rowSubtotal;
+                totalGst += gstAmount;
+            });
+
+            const exactGrandTotal = subtotal + totalGst;
+            const roundedGrandTotal = Math.round(exactGrandTotal);
+            const roundOffVal = roundedGrandTotal - exactGrandTotal;
+
+            const compTx = db.transaction("company", "readonly");
+            compTx.objectStore("company").get("profile").onsuccess = (e) => {
+                const comp = e.target.result || {};
+                const partyStateCode = document.getElementById('client-state-code').value;
+                const taxLabel = document.getElementById('tax-type-label');
+
+                if (partyStateCode && comp.stateCode) {
+                    if (partyStateCode === comp.stateCode) {
+                        const halfGst = (totalGst / 2).toFixed(2);
+                        taxLabel.innerHTML = `CGST (₹${halfGst}) + SGST (₹${halfGst}): <span id="gst-total">₹${totalGst.toFixed(2)}</span>`;
+                    } else {
+                        taxLabel.innerHTML = `IGST Amount: <span id="gst-total">₹${totalGst.toFixed(2)}</span>`;
+                    }
+                } else {
+                    taxLabel.innerHTML = `GST Amount: <span id="gst-total">₹${totalGst.toFixed(2)}</span>`;
+                }
+
+                document.getElementById('sub-total').innerText = `₹${subtotal.toFixed(2)}`;
+                document.getElementById('round-off').innerText = `₹${roundOffVal >= 0 ? '+' : ''}${roundOffVal.toFixed(2)}`;
+                document.getElementById('grand-total').innerText = `₹${roundedGrandTotal.toFixed(2)}`;
+            };
+        }
+
+        // Save Voucher & Auto-Clear Form
+        function saveDocument() {
+            const clientName = document.getElementById('client-name').value;
+            const vNo = document.getElementById('voucher-no').value;
+            if (!clientName) return showToast("Please select party name!", "warning");
+            if (!vNo) return showToast("Voucher/Invoice number missing!", "warning");
+
+            const items = [];
+            document.querySelectorAll('#line-items tr').forEach(row => {
+                const desc = row.querySelector('.item-desc').value;
+                if(desc) {
+                    items.push({
+                        desc: desc,
+                        hsn: row.querySelector('.item-hsn').value,
+                        unit: row.querySelector('.item-unit').value,
+                        qty: row.querySelector('.item-qty').value,
+                        price: row.querySelector('.item-price').value,
+                        gst: row.querySelector('.item-gst').value,
+                        total: row.querySelector('.item-total').innerText
+                    });
+                }
+            });
+
+            if(items.length === 0) return showToast("Add at least one item!", "warning");
+
+            const editId = document.getElementById('editing-voucher-id').value;
+            const record = {
+                vNo: vNo,
+                client: clientName,
+                clientGst: document.getElementById('client-gst').value,
+                clientStateCode: document.getElementById('client-state-code').value,
+                clientAddress: document.getElementById('client-address').value,
+                date: document.getElementById('voucher-date').value,
+                subtotal: document.getElementById('sub-total').innerText,
+                gst: document.getElementById('gst-total').innerText,
+                roundOff: document.getElementById('round-off').innerText,
+                grandTotal: document.getElementById('grand-total').innerText,
+                items: items
+            };
+
+            const tx = db.transaction("invoices", "readwrite");
+            if(editId) {
+                record.id = parseInt(editId);
+                tx.objectStore("invoices").put(record);
+            } else {
+                tx.objectStore("invoices").add(record);
+            }
+
+            tx.oncomplete = () => {
+                showToast("Voucher Saved Successfully!");
+                generateInvoicePrint(record);
+                clearVoucherForm();
+            };
+        }
+
+        function clearVoucherForm() {
+            document.getElementById('editing-voucher-id').value = "";
+            document.getElementById('client-name').value = "";
+            document.getElementById('client-gst').value = "";
+            document.getElementById('client-state-display').value = "";
+            document.getElementById('client-state-code').value = "";
+            document.getElementById('client-address').value = "";
+            document.getElementById('line-items').innerHTML = "";
+            document.getElementById('save-voucher-btn').innerHTML = `<i class="fa-solid fa-check-double"></i> Save & Generate Bill`;
+            addItemRow();
+            generateVoucherNumber();
+        }
+
+        // Voucher History with Edit & Delete
+        function loadHistory() {
+            const tbody = document.getElementById('history-list');
+            tbody.innerHTML = "";
+            const tx = db.transaction("invoices", "readonly");
+            tx.objectStore("invoices").openCursor().onsuccess = (e) => {
+                const cursor = e.target.result;
+                if (cursor) {
+                    const data = cursor.value;
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${data.date}</td>
+                            <td><strong>${data.vNo}</strong></td>
+                            <td>${data.client}</td>
+                            <td>${data.grandTotal}</td>
+                            <td class="action-btns">
+                                <button class="btn btn-primary" onclick='generateInvoicePrint(${JSON.stringify(data)})'><i class="fa-solid fa-eye"></i></button>
+                                <button class="btn btn-warning" onclick='editVoucher(${JSON.stringify(data)})'><i class="fa-solid fa-pen"></i></button>
+                                <button class="btn btn-danger" onclick='deleteVoucher(${data.id})'><i class="fa-solid fa-trash"></i></button>
+                            </td>
+                        </tr>
+                    `;
+                    cursor.continue();
+                }
+            };
+        }
+
+        function editVoucher(data) {
+            switchTab('billing', document.querySelectorAll('.nav-item')[3]);
+            document.getElementById('editing-voucher-id').value = data.id;
+            document.getElementById('voucher-no').value = data.vNo;
+            document.getElementById('voucher-date').value = data.date;
+            document.getElementById('client-name').value = data.client;
+            document.getElementById('client-gst').value = data.clientGst;
+            document.getElementById('client-state-code').value = data.clientStateCode;
+            document.getElementById('client-address').value = data.clientAddress;
+            
+            const st = gstStates.find(s => s.code === data.clientStateCode);
+            document.getElementById('client-state-display').value = `${st ? st.name : ''} (Code: ${data.clientStateCode || '-'})`;
+
+            const tbody = document.getElementById('line-items');
+            tbody.innerHTML = "";
+            data.items.forEach(item => addItemRow(item));
+            
+            document.getElementById('save-voucher-btn').innerHTML = `<i class="fa-solid fa-pen-to-square"></i> Update Voucher`;
+            showToast("Voucher Loaded for Editing", "warning");
+        }
+
+        function deleteVoucher(id) {
+            if(confirm("Are you sure you want to delete this Voucher?")) {
+                const tx = db.transaction("invoices", "readwrite");
+                tx.objectStore("invoices").delete(id);
+                tx.oncomplete = () => {
+                    showToast("Voucher Deleted", "danger");
+                    loadHistory();
+                };
+            }
+        }
+
+        // Modern A4 Invoice Format with Header/Footer Repeating Support
+        function generateInvoicePrint(data) {
+            const companyTx = db.transaction("company", "readonly");
+            companyTx.objectStore("company").get("profile").onsuccess = (e) => {
+                const comp = e.target.result || {};
+                const gstVal = parseFloat(data.gst.replace('₹','')) || 0;
+                const isSameState = (!data.clientStateCode || data.clientStateCode === comp.stateCode);
+                const halfGst = (gstVal / 2).toFixed(2);
+
+                const compSt = gstStates.find(s => s.code === comp.stateCode);
+                const partySt = gstStates.find(s => s.code === data.clientStateCode);
+
+                const preview = document.getElementById('invoice-preview');
+                preview.innerHTML = `
+                    <div style="font-family: Arial, sans-serif; color:#000; width:100%; max-width:800px; margin:auto; line-height:1.4;">
+                        <table style="width:100%; border-collapse:collapse;">
+                            <!-- Repeating Header on Multi-page A4 -->
+                            <thead>
+                                <tr>
+                                    <td>
+                                        <div style="border-bottom:2px solid #000; padding-bottom:10px; margin-bottom:10px;">
+                                            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                                                <div>
+                                                    <h1 style="margin:0; font-size:22px; color:#4f46e5;">${comp.name || 'YOUR FIRM NAME'}</h1>
+                                                    <p style="margin:2px 0; font-size:12px; white-space:pre-line;">${comp.address || ''}</p>
+                                                    <p style="margin:2px 0; font-size:12px;">Mobile: ${comp.phone || 'N/A'} | Email: ${comp.email || 'N/A'}</p>
+                                                    <p style="margin:2px 0; font-size:12px;"><strong>GSTIN: ${comp.gst || 'N/A'}</strong> | State Code: ${comp.stateCode || '-'}</p>
+                                                </div>
+                                                <div style="text-align:right;">
+                                                    <h2 style="margin:0; font-size:18px; color:#333;">TAX INVOICE</h2>
+                                                    <p style="margin:4px 0; font-size:12px;"><strong>Invoice No:</strong> ${data.vNo}</p>
+                                                    <p style="margin:2px 0; font-size:12px;"><strong>Date:</strong> ${data.date}</p>
+                                                </div>
+                                            </div>
+                                            <hr style="margin-top:10px; border:0; border-top:1px solid #000;">
+                                            <div style="display:flex; justify-content:space-between; margin-top:8px; font-size:12px;">
+                                                <div style="width:55%;">
+                                                    <h4 style="margin:0 0 4px 0; text-decoration:underline;">BILLED TO:</h4>
+                                                    <p style="margin:2px 0; font-size:14px;"><strong>M/s ${data.client}</strong></p>
+                                                    <p style="margin:2px 0; white-space:pre-line;">${data.clientAddress || ''}</p>
+                                                    <p style="margin:2px 0;">GSTIN: <strong>${data.clientGst || 'N/A'}</strong></p>
+                                                    <p style="margin:2px 0;">State: <strong>${partySt ? partySt.name : '-'} (Code: ${data.clientStateCode || '-'})</strong></p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </thead>
+
+                            <!-- Item Table -->
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <table style="width:100%; border-collapse:collapse; font-size:11px; margin-bottom:15px;">
+                                            <thead>
+                                                <tr style="background:#f1f5f9; text-align:left;">
+                                                    <th style="border:1px solid #000; padding:6px; text-align:center;">S.N.</th>
+                                                    <th style="border:1px solid #000; padding:6px;">Item Description</th>
+                                                    <th style="border:1px solid #000; padding:6px; text-align:center;">HSN</th>
+                                                    <th style="border:1px solid #000; padding:6px; text-align:center;">Qty</th>
+                                                    <th style="border:1px solid #000; padding:6px; text-align:center;">Unit</th>
+                                                    <th style="border:1px solid #000; padding:6px; text-align:right;">Rate (₹)</th>
+                                                    <th style="border:1px solid #000; padding:6px; text-align:center;">GST %</th>
+                                                    <th style="border:1px solid #000; padding:6px; text-align:right;">Total (₹)</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                ${data.items.map((item, idx) => `
+                                                    <tr>
+                                                        <td style="border:1px solid #000; padding:6px; text-align:center;">${idx+1}</td>
+                                                        <td style="border:1px solid #000; padding:6px;">${item.desc}</td>
+                                                        <td style="border:1px solid #000; padding:6px; text-align:center;">${item.hsn}</td>
+                                                        <td style="border:1px solid #000; padding:6px; text-align:center;">${item.qty}</td>
+                                                        <td style="border:1px solid #000; padding:6px; text-align:center;">${item.unit}</td>
+                                                        <td style="border:1px solid #000; padding:6px; text-align:right;">${item.price}</td>
+                                                        <td style="border:1px solid #000; padding:6px; text-align:center;">${item.gst}%</td>
+                                                        <td style="border:1px solid #000; padding:6px; text-align:right;">${item.total}</td>
+                                                    </tr>
+                                                `).join('')}
+                                            </tbody>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </tbody>
+
+                            <!-- Repeating Footer -->
+                            <tfoot>
+                                <tr>
+                                    <td>
+                                        <div style="border:1px solid #000; padding:10px; font-size:12px;">
+                                            <div style="display:flex; justify-content:space-between;">
+                                                <div style="width:50%;">
+                                                    <p style="margin:0 0 5px 0;"><strong>Bank Account Details:</strong></p>
+                                                    <p style="margin:0; white-space:pre-line;">${comp.bank || 'N/A'}</p>
+                                                </div>
+                                                <div style="width:45%; text-align:right; line-height:1.6;">
+                                                    <p style="margin:0;">Taxable Value: <strong>${data.subtotal}</strong></p>
+                                                    ${isSameState ? `
+                                                        <p style="margin:0;">CGST Amount: <strong>₹${halfGst}</strong></p>
+                                                        <p style="margin:0;">SGST Amount: <strong>₹${halfGst}</strong></p>
+                                                    ` : `
+                                                        <p style="margin:0;">IGST Amount: <strong>₹${gstVal.toFixed(2)}</strong></p>
+                                                    `}
+                                                    <p style="margin:0;">Round Off: <strong>${data.roundOff}</strong></p>
+                                                    <h3 style="margin:4px 0 0 0; font-size:16px;">Grand Total: ${data.grandTotal}</h3>
+                                                </div>
+                                            </div>
+                                            <div style="margin-top:25px; display:flex; justify-content:space-between; align-items:flex-end;">
+                                                <div>
+                                                    <p style="margin:0; font-size:10px;">Terms & Conditions: Goods once sold will not be taken back.</p>
+                                                </div>
+                                                <div style="text-align:center;">
+                                                    <p style="margin:0 0 35px 0;">For <strong>${comp.name || 'YOUR FIRM'}</strong></p>
+                                                    <p style="margin:0;">Authorized Signatory</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                `;
+                document.getElementById('print-modal').style.display = "flex";
+            };
+        }
+
+        function closeModal() { document.getElementById('print-modal').style.display = "none"; }
+
+        addItemRow();
+    </script>
+</body>
+</html>
